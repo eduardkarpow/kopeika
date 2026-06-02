@@ -1,0 +1,67 @@
+services:
+  control-plane:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: build/package/control-plane.Dockerfile
+    tty: true
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - build/package/dev.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
+  postgres:
+    container_name: pg
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: kopeika
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+  local-registry:
+    container_name: registry
+    image: registry:2
+    ports:
+      - "5001:5000"
+    volumes:
+      - registry_data:/var/lib/registry
+    networks:
+      - default
+  traefik:
+    container_name: traefik
+    image: traefik:v3.0
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8081:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - default
+volumes:
+  pgdata:
+  registry_data:
+
+networks:
+  default:
+    name: defaults
