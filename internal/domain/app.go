@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -19,15 +21,15 @@ const (
 )
 
 type App struct {
-	ID        string    `json:"id"`
-	UserID    int       `json:"user_id"`
-	Name      string    `json:"name"`
-	RepoURL   string    `json:"repo_url"`
-	Branch    string    `json:"branch"`
-	Status    string    `json:"status"`
-	EnvVars   EnvVars   `json:"env_vars"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        string    `json:"id" db:"id"`
+	UserID    int       `json:"user_id" db:"user_id"`
+	Name      string    `json:"name" db:"name"`
+	RepoURL   string    `json:"repo_url" db:"repo_url"`
+	Branch    string    `json:"branch" db:"branch"`
+	Status    string    `json:"status" db:"status"`
+	EnvVars   EnvVars   `json:"env_vars" db:"env_vars"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type AppRepository interface {
@@ -66,4 +68,25 @@ func (s ProjectStatus) Validate() error {
 	default:
 		return fmt.Errorf("%w: %s", errors.New("invalid status value"), s)
 	}
+}
+
+var (
+	NameRegex         = "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+	ErrInvalidName    = errors.New("Name is not valid")
+	ErrBranchInvalid  = errors.New("Branch is Empty")
+	ErrRepoUrlInvalid = errors.New("repo url is Empty")
+)
+
+func (a *App) Validate() error {
+	ok, _ := regexp.MatchString(NameRegex, a.Name)
+	if !ok {
+		return ErrInvalidName
+	}
+	if strings.TrimSpace(a.Branch) == "" {
+		return ErrBranchInvalid
+	}
+	if strings.TrimSpace(a.RepoURL) == "" {
+		return ErrRepoUrlInvalid
+	}
+	return nil
 }
