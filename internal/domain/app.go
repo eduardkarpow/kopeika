@@ -57,7 +57,7 @@ func (e *EnvVars) Scan(value interface{}) error {
 	return json.Unmarshal(bytes, e)
 }
 
-func (e *EnvVars) Value() (driver.Value, error) {
+func (e EnvVars) Value() (driver.Value, error) {
 	return json.Marshal(e)
 }
 

@@ -2,6 +2,8 @@ module kopeika
 
 go 1.25.0
 
+require github.com/lib/pq v1.12.3
+
 require (
 	github.com/bytedance/gopkg v0.1.4 // indirect
 	github.com/bytedance/sonic v1.15.2 // indirect

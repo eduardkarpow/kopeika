@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"kopeika/internal/domain"
 	"net/http"
 
@@ -26,7 +27,7 @@ func (h *Handler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	err := h.service.Create(ctx, app)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Validation error"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Validation error %v", err)})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"success": true})
