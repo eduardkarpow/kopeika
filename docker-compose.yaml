@@ -1,14 +1,17 @@
 services:
   control-plane:
     container_name: backend
+    user: root
     build:
       context: .
       dockerfile: build/package/control-plane.Dockerfile
     tty: true
     volumes:
       - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8000:8000"
+      - "8080:8080"
     env_file:
       - build/package/dev.env
     depends_on:

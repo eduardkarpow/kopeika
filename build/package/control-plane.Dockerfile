@@ -6,6 +6,7 @@ RUN apk add --no-cache git build-base
 
 RUN apk add --no-cache curl && \
     curl -sSfL https://raw.githubusercontent.com/air-verse/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
 COPY go.mod ./
 RUN go mod download

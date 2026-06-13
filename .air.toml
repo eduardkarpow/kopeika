@@ -21,15 +21,24 @@ tmp_dir = "tmp"
   include_dir = []
   include_ext = ["go", "tpl", "tmpl", "html"]
   include_file = []
-  kill_delay = "0s"
+  
+  # CHANGE 1: Give the old process 500ms to free up port 8000
+  kill_delay = "500ms" 
+  
   log = "build-errors.log"
-  poll = false
-  poll_interval = 0
+  
+  # CHANGE 2: Force Air to poll for changes inside Docker mount volumes
+  poll = true
+  poll_interval = 500 # ms
+  
   post_cmd = []
   pre_cmd = []
   rerun = false
   rerun_delay = 500
-  send_interrupt = false
+  
+  # CHANGE 3: Send a friendly interrupt signal first so Go can release the port cleanly
+  send_interrupt = true 
+  
   stop_on_error = false
 
 [color]
@@ -46,7 +55,8 @@ tmp_dir = "tmp"
   time = false
 
 [misc]
-  clean_on_exit = false
+  # CHANGE 4: Clean up the binary remnants when Air stops
+  clean_on_exit = true
 
 [proxy]
   app_port = 0
